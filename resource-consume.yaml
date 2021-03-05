@@ -1,0 +1,180 @@
+apiVersion: v1
+items:
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: curlimage
+      app.kubernetes.io/component: curlimage
+      app.kubernetes.io/instance: curlimage
+    name: curlimage
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      deploymentconfig: curlimage
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          deploymentconfig: curlimage
+      spec:
+        containers:
+        - args:
+          - bash
+          image: quay.io/chiaretto/curlimage@sha256:d56b2a0daa622bac056b96854606dae5a9a79d451ee55232f767ade6b23c9964
+          imagePullPolicy: Always
+          name: curlimage
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          tty: true
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - curlimage
+        from:
+          kind: ImageStreamTag
+          name: curlimage:latest
+        lastTriggeredImage: quay.io/chiaretto/curlimage@sha256:d56b2a0daa622bac056b96854606dae5a9a79d451ee55232f767ade6b23c9964
+      type: ImageChange
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: resource-consumer
+      app.kubernetes.io/component: resource-consumer
+      app.kubernetes.io/instance: resource-consumer
+    name: resource-consumer
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      deploymentconfig: resource-consumer
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          deploymentconfig: resource-consumer
+      spec:
+        containers:
+        - image: quay.io/chiaretto/resource-consumer@sha256:c5323d1d6be282f0e73d289a82ff3d6b3662c9f7e420d327d2fb8e9272876c7b
+          imagePullPolicy: Always
+          name: resource-consumer
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - resource-consumer
+        from:
+          kind: ImageStreamTag
+          name: resource-consumer:latest
+        lastTriggeredImage: quay.io/chiaretto/resource-consumer@sha256:c5323d1d6be282f0e73d289a82ff3d6b3662c9f7e420d327d2fb8e9272876c7b
+      type: ImageChange
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: curlimage
+      app.kubernetes.io/component: curlimage
+      app.kubernetes.io/instance: curlimage
+    name: curlimage
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/imported-from: quay.io/chiaretto/curlimage
+      from:
+        kind: DockerImage
+        name: quay.io/chiaretto/curlimage
+      generation: 2
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: Source
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: resource-consumer
+      app.kubernetes.io/component: resource-consumer
+      app.kubernetes.io/instance: resource-consumer
+    name: resource-consumer
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/imported-from: quay.io/chiaretto/resource-consumer
+      from:
+        kind: DockerImage
+        name: quay.io/chiaretto/resource-consumer
+      generation: 2
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: Source
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: resource-consumer
+      app.kubernetes.io/component: resource-consumer
+      app.kubernetes.io/instance: resource-consumer
+    name: resource-consumer
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      deploymentconfig: resource-consumer
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""
