@@ -34,7 +34,13 @@ items:
           image: quay.io/chiaretto/curlimage@sha256:d56b2a0daa622bac056b96854606dae5a9a79d451ee55232f767ade6b23c9964
           imagePullPolicy: Always
           name: curlimage
-          resources: {}
+          resources:
+           requests:
+             cpu: 100m
+             memory: 256Mi
+           limits: 
+             cpu: 1
+             memory: 1Gi
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           tty: true
@@ -90,7 +96,13 @@ items:
           ports:
           - containerPort: 8080
             protocol: TCP
-          resources: {}
+          resources:
+           requests:
+             cpu: 100m
+             memory: 256Mi
+           limits: 
+             cpu: 4
+             memory: 4Gi
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
         dnsPolicy: ClusterFirst
