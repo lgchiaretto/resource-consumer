@@ -1,8 +1,7 @@
-apiVersion: autoscaling/v2beta2 
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: memory-autoscale 
-  namespace: resource-consumer
 spec:
   scaleTargetRef:
     apiVersion: apps.openshift.io/v1 
