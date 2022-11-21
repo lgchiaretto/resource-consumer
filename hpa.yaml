@@ -1,33 +1,12 @@
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: memory-autoscale 
+  name: resource-consumer
 spec:
+  maxReplicas: 6
+  minReplicas: 3
   scaleTargetRef:
     apiVersion: apps/v1 
     kind: Deployment
     name: resource-consumer
-  minReplicas: 1 
-  maxReplicas: 10 
-  metrics: 
-  - type: Resource
-    resource:
-      name: memory 
-      target:
-        type: Utilization 
-        averageUtilization: 70 
-  behavior: 
-    scaleUp:
-      stabilizationWindowSeconds: 60
-      policies:
-      - type: Pods
-        value: 2
-        periodSeconds: 120
-      selectPolicy: Max
-    scaleDown: 
-      policies: 
-      - type: Pods 
-        value: 1 
-        periodSeconds: 60
-      selectPolicy: Min 
-      stabilizationWindowSeconds: 60
+  targetCPUUtilizationPercentage: 800
