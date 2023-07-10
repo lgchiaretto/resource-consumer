@@ -41,7 +41,7 @@ items:
              memory: 256Mi
            limits: 
              cpu: 1
-             memory: 1Gi
+             memory: 512Mi
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           tty: true
@@ -101,10 +101,10 @@ items:
           resources:
            requests:
              cpu: 100m
-             memory: 256Mi
+             memory: 2Gi
            limits: 
              cpu: 4
-             memory: 4Gi
+             memory: 2Gi
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
         dnsPolicy: ClusterFirst
