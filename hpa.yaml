@@ -4,9 +4,9 @@ metadata:
   name: resource-consumer
 spec:
   maxReplicas: 6
-  minReplicas: 3
+  minReplicas: 1
   scaleTargetRef:
     apiVersion: apps/v1 
     kind: Deployment
     name: resource-consumer
-  targetCPUUtilizationPercentage: 800
+  targetCPUUtilizationPercentage: 80
